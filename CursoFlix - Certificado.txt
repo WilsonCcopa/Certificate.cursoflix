@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Certificados - CursoFlix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .certificate {
+            background-color: white;
+            width: 297mm; /* Ancho A4 horizontal */
+            height: 210mm; /* Alto A4 horizontal */
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://via.placeholder.com/297x210/ffffff/cccccc?text=Fondo+Decorativo') no-repeat center center;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        .certificate-content {
+            position: relative;
+            z-index: 2;
+            padding: 50px;
+            text-align: center;
+        }
+        .certificate h1 {
+            font-size: 48px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .certificate h2 {
+            font-size: 32px;
+            color: #34495e;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .certificate p {
+            font-size: 20px;
+            color: #7f8c8d;
+            margin: 10px 0;
+        }
+        .certificate .name {
+            font-size: 40px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 30px 0;
+            text-transform: uppercase;
+        }
+        .certificate .date {
+            font-size: 24px;
+            color: #95a5a6;
+            margin-top: 20px;
+        }
+        .certificate .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 100px;
+        }
+        .input-container {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-container input {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .download-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 5px;
+        }
+        .download-btn:hover {
+            background-color: #2980b9;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate" id="certificate">
+        <img src="https://play-lh.googleusercontent.com/hhYv9rcEzvlU1hkJ32KMrfiwwlcsTho6CBE5nhq0fGtyq__rZPSSdvDl2D6aI7cTCpz_=w240-h480-rw" alt="Logo CursoFlix" class="logo">
+        <div class="certificate-content">
+            <h1>Certificado de Finalización</h1>
+            <h2>Curso de Inglés Básico</h2>
+            <p>Este certificado reconoce que</p>
+            <div class="name" id="userName">[Nombre del Usuario]</div>
+            <p>ha completado con éxito el curso de <strong>Inglés Básico</strong> en <strong>CursoFlix</strong>, con un total de <strong>6 horas de teoría</strong> y <strong>3 horas de práctica</strong>.</p>
+            <p class="date">Fecha: <span id="currentDate"></span></p>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="nameInput" placeholder="Ingresa tu nombre completo">
+        <button onclick="downloadCertificate('png')" class="download-btn">Descargar como PNG</button>
+        <button onclick="downloadCertificate('pdf')" class="download-btn">Descargar como PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Inicializar jsPDF
+        const { jsPDF } = window.jspdf;
+
+        function downloadCertificate(format) {
+            const userName = document.getElementById('nameInput').value;
+            if (!userName) {
+                alert('Por favor, ingresa tu nombre completo.');
+                return;
+            }
+
+            const currentDate = new Date().toLocaleDateString();
+            document.getElementById('userName').innerText = userName;
+            document.getElementById('currentDate').innerText = currentDate;
+
+            // Configuración de html2canvas para mantener los colores
+            html2canvas(document.getElementById('certificate'), {
+                scale: 2, // Aumenta la calidad de la imagen
+                logging: true, // Opcional: para depuración
+                useCORS: true, // Permite cargar imágenes externas
+                allowTaint: true, // Permite el uso de imágenes externas
+            }).then(canvas => {
+                if (format === 'png') {
+                    // Descargar como PNG
+                    const link = document.createElement('a');
+                    link.download = 'Certificado_CursoFlix.png';
+                    link.href = canvas.toDataURL('image/png', 1.0); // Calidad máxima
+                    link.click();
+                } else if (format === 'pdf') {
+                    // Descargar como PDF
+                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    const pdf = new jsPDF('l', 'mm', 'a4'); // Formato A4 horizontal
+                    const width = pdf.internal.pageSize.getWidth();
+                    const height = pdf.internal.pageSize.getHeight();
+                    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+                    pdf.save('Certificado_CursoFlix.pdf');
+                }
+            });
+        }
+
+        // Mostrar la fecha actual al cargar la página
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString();
+    </script>
+</body>
+</html>
